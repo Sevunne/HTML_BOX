@@ -42,7 +42,7 @@
 
 1. **克隆项目**
    ```bash
-   git clone https://github.com/your-username/html-box.git
+   git clone https://github.com/Sevunne/html-box.git
    cd html-box
    ```
 2. **一键安装全部依赖**
