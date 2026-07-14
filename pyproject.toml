@@ -17,8 +17,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-username/html-box"
-Repository = "https://github.com/your-username/html-box"
+Homepage = "https://github.com/Sevunne/html-box"
+Repository = "https://github.com/Sevunne/html-box"
 
 [project.scripts]
 html-box = "HTML_BOX_main:main"
