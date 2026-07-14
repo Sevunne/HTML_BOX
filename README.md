@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/License-Proprietary-red.svg)
 
 🌐 Language
-[English](README.en.md) | **中文**
+[English](README_en.md) | **中文**
 
 
 ## ✨ 功能特色
