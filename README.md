@@ -6,6 +6,10 @@
 ![PySide6](https://img.shields.io/badge/PySide6-6.4+-green.svg)
 ![License](https://img.shields.io/badge/License-Proprietary-red.svg)
 
+🌐 Language
+[English](README.en.md) | **中文**
+
+
 ## ✨ 功能特色
 
 ### 🎨 编辑器功能
