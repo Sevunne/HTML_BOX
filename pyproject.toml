@@ -1,0 +1,28 @@
+[project]
+name = "html-box"
+version = "1.3.0"
+description = "A dark theme HTML editor with real-time preview"
+authors = [
+    { name = "布丁", email = "cake2648@outlook.com" }
+]
+readme = "README.md"
+requires-python = ">=3.6"
+license = { text = "MIT" }
+keywords = ["html", "editor", "pyqt5", "realtime-preview"]
+
+dependencies = [
+    "PyQt5>=5.15.0",
+    "PyQtWebEngine>=5.15.0",
+    "win11toast>=0.1.0; sys_platform == 'win32'",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/html-box"
+Repository = "https://github.com/your-username/html-box"
+
+[project.scripts]
+html-box = "HTML_BOX_main:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
