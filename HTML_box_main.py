@@ -1,5 +1,3 @@
-import sys
-import os
 import json
 import shutil
 import time
@@ -11,6 +9,7 @@ import webbrowser
 from datetime import datetime
 import os
 import sys
+#from html_dom_parser import html_to_node_tree, node_tree_to_html
 
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
@@ -332,6 +331,9 @@ class AboutDialog(QDialog):
         """显示完整版本历史"""
         full_versions = [
             "v2.0.0 - 新增积木节点模式、.htbx工程文件、双向代码同步",
+            "v1.9.0 - 解决堆栈溢出问题",
+            "v1.7.0 - 改bug",
+            "v1.4.0 - 全面改用pyside6制作",
             "v1.3.0 - 新增关于窗口和彩蛋功能",
             "v1.2.1 - 修复设置对话框崩溃问题",
             "v1.2.0 - 添加语法高亮功能",
@@ -342,7 +344,7 @@ class AboutDialog(QDialog):
             "v1.0.1 - 优化界面布局",
             "v1.0.0 - 基础编辑器功能发布",
             "v0.9.0 - Beta测试版本",
-            "v0.8.0 - Alpha内部测试版本",
+            "v0.8.0 - Alpha测试版本",
             "v0.1.0 - 项目初始版本"
         ]
         # 创建显示完整版本的对话框
@@ -1087,9 +1089,28 @@ class BlockEditorWidget(QWidget):
     def on_tree_modified(self):
         html = self.tree_widget.generate_full_html()
         self.htmlUpdateSignal.emit(html)
+
     def load_html_to_tree(self, html_str):
-        """简易HTML转节点树（基础解析，双向同步）"""
-        pass
+        """外部传入HTML文本，自动解析并渲染到积木树"""
+        from html_dom_parser import html_to_node_tree
+
+        root_model = html_to_node_tree(html_str)
+        if not root_model:
+            return
+
+        # 把解析出来的通用节点 → 转为 BlockNodeItem
+        def model_to_item(node):
+            item = BlockNodeItem(node.tag_name, node.attrs, node.inner_text)
+            for child_model in node.children:
+                child_item = model_to_item(child_model)
+                item.addChild(child_item)
+                item.child_nodes.append(child_item)
+            return item
+
+        new_root = model_to_item(root_model)
+        serial_data = new_root.serialize()
+        self.tree_widget.load_from_serial(serial_data)
+
     def get_serialized_nodes(self):
         return self.tree_widget.root.serialize()
     def load_serialized_nodes(self, data):
@@ -1219,15 +1240,14 @@ class DarkThemeHTMLIDE(QMainWindow):
         self.load_htbx_btn.clicked.connect(self.load_htbx_project)
         bar_layout.addWidget(self.save_htbx_btn)
         bar_layout.addWidget(self.load_htbx_btn)
-        # parent_layout.addWidget(mode_bar) ← 删掉这一行！不再单独占一行
         return mode_bar  # 返回整块控件，交给工具栏摆放
 
     def switch_code_mode(self):
         if self.edit_mode == "code":
             return
         # 同步积木生成代码到编辑器
-        block_html = self.block_editor.tree_widget.generate_full_html()
-        self.editor.setPlainText(block_html)
+        #block_html = self.block_editor.tree_widget.generate_full_html()
+        #self.editor.setPlainText(block_html)
         # 清空左侧布局，切换为代码面板
         self.clear_left_stack()
         self.left_stack_layout.addWidget(self.code_frame)
@@ -1237,9 +1257,10 @@ class DarkThemeHTMLIDE(QMainWindow):
     def switch_block_mode(self):
         if self.edit_mode == "block":
             return
-        # 同步编辑器代码到积木树
+        # 读取代码，生成积木（只读取，不改代码）
         code_html = self.editor.toPlainText()
-        # 清空左侧布局，切换积木面板
+        self.block_editor.load_html_to_tree(code_html)
+        # 切换界面
         self.clear_left_stack()
         self.left_stack_layout.addWidget(self.block_editor)
         self.edit_mode = "block"
@@ -1253,9 +1274,9 @@ class DarkThemeHTMLIDE(QMainWindow):
                 w.setParent(None)
     def on_block_html_changed(self, html):
         if self.auto_sync and self.edit_mode == "block":
-            self.editor.blockSignals(True)
-            self.editor.setPlainText(html)
-            self.editor.blockSignals(False)
+            #self.editor.blockSignals(True)
+            #self.editor.setPlainText(html)
+            #self.editor.blockSignals(False)
             self.preview_timer.start(int(self.settings.value("preview/delay", 500)))
     def create_toolbar(self):
         toolbar = QToolBar("主工具栏")
